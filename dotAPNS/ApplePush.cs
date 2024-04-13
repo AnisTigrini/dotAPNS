@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
-using System.Security.Cryptography.X509Certificates;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -12,6 +10,9 @@ namespace dotAPNS
     {
         public string Token { get; private set; }
         public string VoipToken { get; private set; }
+
+        public List<string> Tokens {get; private set;}
+        public List<string> VoipTokens {get; private set;}
 
         public int Priority =>
             CustomPriority ?? (Type == ApplePushType.Background ? 5 : 10); // 5 for background, 10 for everything else
@@ -268,6 +269,10 @@ namespace dotAPNS
                     $"Please use AddVoipToken() when sending {nameof(ApplePushType.Voip)} pushes.");
             Token = token;
             return this;
+        }
+
+        public ApplePush AddTokens([NotNull] List<string> tokens) {
+
         }
 
         public ApplePush AddVoipToken([NotNull] string voipToken)

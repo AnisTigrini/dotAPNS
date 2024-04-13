@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Dynamic;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
@@ -16,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+
 #if !NET46
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
@@ -135,8 +131,7 @@ namespace dotAPNS
                 + (_useBackupPort ? ":2197" : ":443")
                 + "/3/device/"
                 + (push.Token ?? push.VoipToken);
-            var req = new HttpRequestMessage(HttpMethod.Post, url);
-            req.Version = new Version(2, 0);
+            var req = new HttpRequestMessage(HttpMethod.Post, url) { Version = new Version(2,0)};
             req.Headers.Add("apns-priority", push.Priority.ToString());
             req.Headers.Add("apns-push-type", push.Type.ToString().ToLowerInvariant());
             req.Headers.Add("apns-topic", GetTopic(push.Type));
@@ -188,7 +183,7 @@ namespace dotAPNS
             {
                 errorPayload = JsonConvert.DeserializeObject<ApnsErrorResponsePayload>(respContent);
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
                 return ApnsResponse.Error(ApnsResponseReason.Unknown, 
                     $"Status: {statusCode}, reason: {respContent ?? "not specified"}.");
@@ -304,7 +299,6 @@ namespace dotAPNS
                 case ApplePushType.Background:
                 case ApplePushType.Alert:
                     return _bundleId;
-                    break;
                 case ApplePushType.Voip:
                     return _bundleId + ".voip";
                 case ApplePushType.Location:
